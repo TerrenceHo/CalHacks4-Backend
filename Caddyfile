@@ -1,6 +1,0 @@
-35.202.142.209 {
-    gzip
-    proxy / localhost:3000 {
-        transparent
-    }
-}
