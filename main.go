@@ -4,44 +4,35 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"strconv"
 
+	"github.com/TerrenceHo/CalHacks4-Backend/config"
 	"github.com/TerrenceHo/CalHacks4-Backend/controllers"
 	"github.com/TerrenceHo/CalHacks4-Backend/models"
 	"github.com/gorilla/mux"
 )
 
-const (
-	host     = "localhost"
-	port     = "5432"
-	user     = "kho"
-	password = ""
-	name     = "calhacks"
-	pepper   = "dev-pepper"
-)
-
 func main() {
-	connection := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable", host, port, user, name)
+	cfg := config.LoadConfig()
+	// connection := fmt.Sprintf("host=%s port=%s user=%s dbname=%s sslmode=disable", host, port, user, name)
 	services, err := models.NewServices(
-		models.WithGorm("postgres", connection),
-		models.WithLogMode(true),
-		models.WithUser(pepper),
+		models.WithGorm(cfg.DatabaseDialect(), cfg.DatabaseConnectionInfo()),
+		models.WithLogMode(!cfg.IsProd()),
+		models.WithUser(cfg.Pepper),
 	)
 	must(err)
 	defer services.Close()
 	err = services.AutoMigrate()
 	must(err)
 
-	usersC := controllers.NewUsers(services.User)
+	usersC := controllers.NewUsers(services.User, cfg.SignKey)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", homePage).Methods("GET")
 	router.HandleFunc("/api/v1/user/register", usersC.Create).Methods("POST")
 	router.HandleFunc("/api/v1/user/login", usersC.Login).Methods("POST")
 
-	port := 12000
-	fmt.Println("Listening on Port", port)
-	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))
+	log.Println("Listening on Port", cfg.Port)
+	log.Fatal(http.ListenAndServe(":"+cfg.Port, router))
 }
 
 func homePage(w http.ResponseWriter, r *http.Request) {
