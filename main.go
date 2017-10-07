@@ -37,8 +37,9 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/", homePage).Methods("GET")
 	router.HandleFunc("/api/v1/user/register", usersC.Create).Methods("POST")
+	router.HandleFunc("/api/v1/user/login", usersC.Login).Methods("POST")
 
-	port := 7983
+	port := 12000
 	fmt.Println("Listening on Port", port)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))
 }
