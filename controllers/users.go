@@ -45,7 +45,19 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := json.NewEncoder(w).Encode(&user); err != nil {
+	tokenString, err := u.createUserJWT(&user)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	user.PasswordHash = ""
+	URF := UsersReturnForm{
+		User:  user,
+		Token: tokenString,
+	}
+
+	if err := json.NewEncoder(w).Encode(&URF); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -56,6 +68,11 @@ type UsersCreateForm struct {
 	Email    string `json:"Email,omitempty"`
 	Password string `json:"Password,omitempty"`
 	UserType string `json:"UserType,omitempty"`
+}
+
+type UsersReturnForm struct {
+	User  models.User
+	Token string
 }
 
 func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +99,13 @@ func (u *Users) Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(&Token{tokenString}); err != nil {
+	user.PasswordHash = ""
+	URF := UsersReturnForm{
+		User:  *user,
+		Token: tokenString,
+	}
+
+	if err := json.NewEncoder(w).Encode(&URF); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
