@@ -41,8 +41,8 @@ func (u *Users) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 type UsersCreateForm struct {
-	Name     string
-	Email    string
-	Password string
-	UserType string
+	Name     string `json:"name,omitempty"`
+	Email    string `json:"email,omitempty"`
+	Password string `json:"password,omitempty"`
+	UserType string `json:"usertype,omitempty"`
 }

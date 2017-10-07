@@ -38,7 +38,7 @@ func main() {
 	router.HandleFunc("/", homePage).Methods("GET")
 	router.HandleFunc("/api/v1/user/register", usersC.Create).Methods("POST")
 
-	port := 12345
+	port := 7983
 	fmt.Println("Listening on Port", port)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(port), router))
 }
