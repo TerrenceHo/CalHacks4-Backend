@@ -35,7 +35,7 @@ func main() {
 	router.HandleFunc("/api/v1/user/login", usersC.Login).Methods("POST")
 
 	router.HandleFunc("/api/v1/classes", classesC.GetAllClasses).Methods("GET")
-	router.HandleFunc("/api/v1/classes/{id}", classesC.GetClass).Methods("GET")
+	router.HandleFunc("/api/v1/classes", classesC.GetClass).Methods("GET").Queries("id", "{id:[0-9]+}")
 	router.HandleFunc("/api/v1/classes/create", classesC.Create).Methods("POST")
 	router.HandleFunc("/api/v1/classes/upload", classesC.Upload).Methods("POST")
 	router.HandleFunc("/api/v1/classes/search", classesC.GetByKeyword).Methods("POST")
