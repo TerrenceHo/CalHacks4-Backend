@@ -70,5 +70,5 @@ func (s *Services) DestructiveReset() error {
 
 // Attempts to migrate User, InboundVehicle, and OutboundVehicle
 func (s *Services) AutoMigrate() error {
-	return s.db.AutoMigrate(&User{}, &Class{}).Error
+	return s.db.AutoMigrate(&User{}, &Class{}, &Video{}).Error
 }

@@ -7,9 +7,17 @@ import (
 
 type Class struct {
 	gorm.Model
-	Name    string
-	Summary string
-	Videos  pq.StringArray `gorm:"type:varchar(200)[]"`
+	Name        string
+	Description string
+	Videos      []Video
+}
+
+type Video struct {
+	gorm.Model
+	ClassID  uint
+	URL      string
+	Summary  string
+	Keywords pq.StringArray `gorm:"type:varchar(200)[]"`
 }
 
 type ClassDB interface {
@@ -50,7 +58,7 @@ func (cg *classGorm) GetAll() ([]Class, error) {
 
 func (cg *classGorm) GetClass(name string) (*Class, error) {
 	class := Class{}
-	err := cg.db.Where("Name = ?", name).First(&class).Error
+	err := cg.db.Where("name = ?", name).First(&class).Error
 	if err != nil {
 		return nil, err
 	}

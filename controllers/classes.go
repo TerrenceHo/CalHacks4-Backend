@@ -26,9 +26,8 @@ func (c *Classes) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	class := models.Class{
-		Name:    form.Name,
-		Summary: form.Summary,
-		Videos:  form.Videos,
+		Name:        form.Name,
+		Description: form.Description,
 	}
 
 	if err := c.cs.CreateClass(&class); err != nil {
@@ -43,9 +42,8 @@ func (c *Classes) Create(w http.ResponseWriter, r *http.Request) {
 }
 
 type ClassesCreateForm struct {
-	Name    string   `json:"Name,omitempty"`
-	Summary string   `json:"Summary,omitempty"`
-	Videos  []string `json:"Videos,omitempty"`
+	Name        string `json:"Name,omitempty"`
+	Description string `json:"Description,omitempty"`
 }
 
 func (c *Classes) GetAllClasses(w http.ResponseWriter, r *http.Request) {
