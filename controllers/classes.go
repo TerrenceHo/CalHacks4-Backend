@@ -168,7 +168,7 @@ func (c *Classes) GetByKeyword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for i := 0; i < len(unique_videos); i++ {
-		videos[i].URL = strings.Replace(videos[i].URL, "gs://", "https://storage.googleapis.com/", 1)
+		unique_videos[i].URL = strings.Replace(unique_videos[i].URL, "gs://", "https://storage.googleapis.com/", 1)
 	}
 
 	if err := json.NewEncoder(w).Encode(&unique_videos); err != nil {
