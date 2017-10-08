@@ -141,7 +141,7 @@ func (c *Classes) GetByKeyword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	all_videos := []models.Video{}
-	keywords := form.Keywords
+	keywords := strings.Split(form.Keywords, " ")
 	for i := 0; i < len(keywords); i++ {
 		videos, err := c.vs.GetByKeyword(form.ClassID, keywords[i])
 		if err != nil {
@@ -170,6 +170,6 @@ func (c *Classes) GetByKeyword(w http.ResponseWriter, r *http.Request) {
 }
 
 type GetKeywordForm struct {
-	ClassID  uint     `json:"ClassID,omitempty"`
-	Keywords []string `json:"Keywords,omitempty"`
+	ClassID  uint   `json:"ClassID,omitempty"`
+	Keywords string `json:"Keywords,omitempty"`
 }
