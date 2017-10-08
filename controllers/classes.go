@@ -77,6 +77,9 @@ func (c *Classes) GetClass(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
 	}
+	for i := 0; i < len(videos); i++ {
+		videos[i].URL = strings.Replace(videos[i].URL, "gs://", "https://storage.googleapis.com/", 1)
+	}
 	if err := json.NewEncoder(w).Encode(&videos); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -163,6 +166,11 @@ func (c *Classes) GetByKeyword(w http.ResponseWriter, r *http.Request) {
 			seen_videos[val.ID] = true
 		}
 	}
+
+	for i := 0; i < len(unique_videos); i++ {
+		videos[i].URL = strings.Replace(videos[i].URL, "gs://", "https://storage.googleapis.com/", 1)
+	}
+
 	if err := json.NewEncoder(w).Encode(&unique_videos); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
