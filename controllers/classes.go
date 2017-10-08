@@ -78,6 +78,12 @@ func (c *Classes) GetClass(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	for i := 0; i < len(videos); i++ {
+		if len(videos[i].Topics) == 0 {
+			videos = append(videos[:i], videos[i+1:]...)
+			i--
+		}
+	}
+	for i := 0; i < len(videos); i++ {
 		videos[i].URL = strings.Replace(videos[i].URL, "gs://", "https://storage.googleapis.com/", 1)
 	}
 	if err := json.NewEncoder(w).Encode(&videos); err != nil {
@@ -144,7 +150,7 @@ func (c *Classes) GetByKeyword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	all_videos := []models.Video{}
-	keywords := strings.Split(form.Keywords, " ")
+	keywords := form.Keywords
 	for i := 0; i < len(keywords); i++ {
 		videos, err := c.vs.GetByKeyword(form.ClassID, keywords[i])
 		if err != nil {
