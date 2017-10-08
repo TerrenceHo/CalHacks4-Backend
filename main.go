@@ -18,6 +18,7 @@ func main() {
 		models.WithGorm(cfg.DatabaseDialect(), cfg.DatabaseConnectionInfo()),
 		models.WithLogMode(!cfg.IsProd()),
 		models.WithUser(cfg.Pepper),
+		models.WithClass(),
 	)
 	must(err)
 	defer services.Close()
@@ -25,11 +26,16 @@ func main() {
 	must(err)
 
 	usersC := controllers.NewUsers(services.User, cfg.SignKey)
+	classesC := controllers.NewClasses(services.Class)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", homePage).Methods("GET")
 	router.HandleFunc("/api/v1/user/register", usersC.Create).Methods("POST")
 	router.HandleFunc("/api/v1/user/login", usersC.Login).Methods("POST")
+
+	router.HandleFunc("/api/v1/classes", classesC.GetAllClasses).Methods("GET")
+	router.HandleFunc("/api/v1/classes/{class}", classesC.GetClass).Methods("GET")
+	router.HandleFunc("/api/v1/classes/create", classesC.Create).Methods("POST")
 
 	log.Println("Listening on Port", cfg.Port)
 	log.Fatal(http.ListenAndServe(":"+cfg.Port, router))

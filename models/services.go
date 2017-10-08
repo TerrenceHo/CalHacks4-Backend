@@ -6,8 +6,9 @@ import (
 )
 
 type Services struct {
-	db   *gorm.DB
-	User UserService
+	db    *gorm.DB
+	User  UserService
+	Class ClassService
 }
 
 type ServicesConfig func(*Services) error
@@ -37,6 +38,13 @@ func WithUser(pepper string) ServicesConfig {
 	}
 }
 
+func WithClass() ServicesConfig {
+	return func(s *Services) error {
+		s.Class = NewClassService(s.db)
+		return nil
+	}
+}
+
 func NewServices(cfgs ...ServicesConfig) (*Services, error) {
 	var s Services
 	for _, cfg := range cfgs {
@@ -62,5 +70,5 @@ func (s *Services) DestructiveReset() error {
 
 // Attempts to migrate User, InboundVehicle, and OutboundVehicle
 func (s *Services) AutoMigrate() error {
-	return s.db.AutoMigrate(&User{}).Error
+	return s.db.AutoMigrate(&User{}, &Class{}).Error
 }
