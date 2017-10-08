@@ -1,48 +1,56 @@
 package models
 
-// import (
-// 	"github.com/jinzhu/gorm"
-// 	"github.com/lib/pq"
-// )
+import (
+	"github.com/jinzhu/gorm"
+	"github.com/lib/pq"
+)
 
-// type Video struct {
-// 	gorm.Model
-// 	ClassID  uint
-// 	URL      string
-// 	Summary  string
-// 	Keywords pq.StringArray `gorm:"type:varchar(200)[]"`
-// }
+type Video struct {
+	gorm.Model
+	ClassID           uint
+	URL               string
+	Topics            pq.StringArray `gorm:"type:varchar(200)[]"`
+	Related_Resources pq.StringArray `gorm:"type:varchar(200)[]"`
+}
 
-// type VideoDB interface {
-// 	GetAll(id uint) ([]Video, error)
-// }
+type VideoDB interface {
+	GetAll(id uint) ([]Video, error)
+	Create(video *Video) error
+	GetByKeyword(keyword string) ([]Video, error)
+}
 
-// type VideoService interface {
-// 	VideoDB
-// }
+type VideoService interface {
+	VideoDB
+}
 
-// func NewVideoService(db *gorm.DB) VideoService {
-// 	return &videoService{
-// 		VideoDB: &videoGorm{db},
-// 	}
-// }
+func NewVideoService(db *gorm.DB) VideoService {
+	return &videoService{
+		VideoDB: &videoGorm{db},
+	}
+}
 
-// type videoService struct {
-// 	VideoDB
-// }
+type videoService struct {
+	VideoDB
+}
 
-// type videoGorm struct {
-// 	db *gorm.DB
-// }
+type videoGorm struct {
+	db *gorm.DB
+}
 
-// func (vg *videoGorm) Create(video *Video) error {
-// 	return vg.db.Create(video).Error
-// }
+func (vg *videoGorm) Create(video *Video) error {
+	return vg.db.Create(video).Error
+}
 
-// func (vg *videoGorm) GetAll(id uint) ([]Video, error) {
-// 	videos := []Video{}
-// 	if err := vg.db.Where("class_id = ?", id).Find(&videos).Error; err != nil {
-// 		return nil, err
-// 	}
-// 	return videos, nil
-// }
+func (vg *videoGorm) GetAll(id uint) ([]Video, error) {
+	videos := []Video{}
+	if err := vg.db.Where("class_id = ?", id).Find(&videos).Error; err != nil {
+		return nil, err
+	}
+	return videos, nil
+}
+
+func (vg *videoGorm) GetByKeyword(keyword string) ([]Video, error) {
+	// videos := []Video{}
+	// err := vd.db.Where("topics =
+	return nil, nil
+}
