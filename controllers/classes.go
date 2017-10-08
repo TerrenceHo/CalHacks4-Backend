@@ -130,7 +130,29 @@ func (c *Classes) GetByKeyword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := json.NewEncoder(w).Encode(&keywords); err != nil {
+	all_videos := []models.Video{}
+	for i := 0; i < len(keywords); i++ {
+		videos, err := c.vs.GetByKeyword(keywords[i])
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		all_videos = append(all_videos, videos...)
+		// for j := 0; j < len(videos); j++ {
+		// 	all_videos = append(all_videos, videos[j]...)
+		// }
+	}
+
+	// Remove duplicates
+	unique_videos := []models.Video{}
+	seen_videos := map[uint]bool{}
+	for _, val := range all_videos {
+		if _, ok := seen_videos[val.ID]; !ok {
+			unique_videos = append(unique_videos, val)
+			seen_videos[val.ID] = true
+		}
+	}
+	if err := json.NewEncoder(w).Encode(&unique_videos); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

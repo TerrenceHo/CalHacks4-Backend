@@ -50,7 +50,10 @@ func (vg *videoGorm) GetAll(id uint) ([]Video, error) {
 }
 
 func (vg *videoGorm) GetByKeyword(keyword string) ([]Video, error) {
-	// videos := []Video{}
-	// err := vd.db.Where("topics =
-	return nil, nil
+	videos := []Video{}
+	err := vg.db.Where("? = ANY(topics)", keyword).Find(&videos).Error
+	if err != nil {
+		return nil, err
+	}
+	return videos, nil
 }
