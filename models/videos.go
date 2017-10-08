@@ -16,7 +16,7 @@ type Video struct {
 type VideoDB interface {
 	GetAll(id uint) ([]Video, error)
 	Create(video *Video) error
-	GetByKeyword(keyword string) ([]Video, error)
+	GetByKeyword(id uint, keyword string) ([]Video, error)
 }
 
 type VideoService interface {
@@ -49,9 +49,10 @@ func (vg *videoGorm) GetAll(id uint) ([]Video, error) {
 	return videos, nil
 }
 
-func (vg *videoGorm) GetByKeyword(keyword string) ([]Video, error) {
+func (vg *videoGorm) GetByKeyword(id uint, keyword string) ([]Video, error) {
 	videos := []Video{}
-	err := vg.db.Where("? = ANY(topics)", keyword).Find(&videos).Error
+	db := vg.db.Where("class_id = ?", id)
+	err := db.Where("? = ANY(topics)", keyword).Find(&videos).Error
 	if err != nil {
 		return nil, err
 	}
