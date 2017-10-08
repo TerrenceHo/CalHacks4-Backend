@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/TerrenceHo/CalHacks4-Backend/models"
@@ -64,12 +65,19 @@ func (c *Classes) GetAllClasses(w http.ResponseWriter, r *http.Request) {
 
 func (c *Classes) GetClass(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	class, err := c.cs.GetClass(vars["class"])
+	id, err := strconv.ParseUint(vars["id"], 10, 32)
+
+	class, err := c.cs.GetClassByID(uint(id))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
-	if err := json.NewEncoder(w).Encode(class); err != nil {
+	videos, err := c.vs.GetAll(class.ID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	if err := json.NewEncoder(w).Encode(&videos); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -88,7 +96,7 @@ func (c *Classes) Upload(w http.ResponseWriter, r *http.Request) {
 
 	for i := 0; i < len(uploads); i++ {
 		Video_URL := strings.Replace(uploads[i].Audio_URL, ".wav", ".mp4", 1)
-		class, err := c.cs.GetClass(class_name)
+		class, err := c.cs.GetClassByName(class_name)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
@@ -126,15 +134,16 @@ type UploadAudioForm struct {
 }
 
 func (c *Classes) GetByKeyword(w http.ResponseWriter, r *http.Request) {
-	keywords := []string{}
-	if err := json.NewDecoder(r.Body).Decode(&keywords); err != nil {
+	form := GetKeywordForm{}
+	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	all_videos := []models.Video{}
+	keywords := form.Keywords
 	for i := 0; i < len(keywords); i++ {
-		videos, err := c.vs.GetByKeyword(keywords[i])
+		videos, err := c.vs.GetByKeyword(form.ClassID, keywords[i])
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
@@ -158,4 +167,9 @@ func (c *Classes) GetByKeyword(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+type GetKeywordForm struct {
+	ClassID  uint     `json:"ClassID,omitempty"`
+	Keywords []string `json:"Keywords,omitempty"`
 }
