@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 	"strings"
 
@@ -78,7 +79,7 @@ func (c *Classes) GetClass(w http.ResponseWriter, r *http.Request) {
 func (c *Classes) Upload(w http.ResponseWriter, r *http.Request) {
 	form := UploadForm{}
 	if err := json.NewDecoder(r.Body).Decode(&form); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -89,7 +90,7 @@ func (c *Classes) Upload(w http.ResponseWriter, r *http.Request) {
 		Video_URL := strings.Replace(uploads[i].Audio_URL, ".wav", ".mp4", 1)
 		class, err := c.cs.GetClass(class_name)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
 
@@ -101,6 +102,7 @@ func (c *Classes) Upload(w http.ResponseWriter, r *http.Request) {
 		}
 		err = c.vs.Create(&video)
 		if err != nil {
+			log.Println("Create", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
