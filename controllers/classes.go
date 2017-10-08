@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/TerrenceHo/CalHacks4-Backend/models"
@@ -64,7 +65,9 @@ func (c *Classes) GetAllClasses(w http.ResponseWriter, r *http.Request) {
 
 func (c *Classes) GetClass(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	class, err := c.cs.GetClass(vars["class"])
+	id, err := strconv.ParseUint(vars["id"], 10, 32)
+
+	class, err := c.cs.GetClassByID(uint(id))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
@@ -93,7 +96,7 @@ func (c *Classes) Upload(w http.ResponseWriter, r *http.Request) {
 
 	for i := 0; i < len(uploads); i++ {
 		Video_URL := strings.Replace(uploads[i].Audio_URL, ".wav", ".mp4", 1)
-		class, err := c.cs.GetClass(class_name)
+		class, err := c.cs.GetClassByName(class_name)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return

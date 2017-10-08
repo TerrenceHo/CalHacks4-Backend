@@ -13,7 +13,8 @@ type Class struct {
 
 type ClassDB interface {
 	GetAll() ([]Class, error)
-	GetClass(name string) (*Class, error)
+	GetClassByID(id uint) (*Class, error)
+	GetClassByName(name string) (*Class, error)
 	CreateClass(class *Class) error
 }
 
@@ -47,7 +48,16 @@ func (cg *classGorm) GetAll() ([]Class, error) {
 	return classes, nil
 }
 
-func (cg *classGorm) GetClass(name string) (*Class, error) {
+func (cg *classGorm) GetClassByID(id uint) (*Class, error) {
+	class := Class{}
+	err := cg.db.Where("id = ?", id).First(&class).Error
+	if err != nil {
+		return nil, err
+	}
+	return &class, nil
+}
+
+func (cg *classGorm) GetClassByName(name string) (*Class, error) {
 	class := Class{}
 	err := cg.db.Where("name = ?", name).First(&class).Error
 	if err != nil {
