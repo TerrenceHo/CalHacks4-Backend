@@ -149,35 +149,29 @@ func (c *Classes) GetByKeyword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	all_videos := []models.Video{}
 	keywords := form.Keywords
-	for i := 0; i < len(keywords); i++ {
-		videos, err := c.vs.GetByKeyword(form.ClassID, keywords[i])
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		all_videos = append(all_videos, videos...)
-		// for j := 0; j < len(videos); j++ {
-		// 	all_videos = append(all_videos, videos[j]...)
-		// }
+	// for i := 0; i < len(keywords); i++ {
+	videos, err := c.vs.GetByKeyword(form.ClassID, keywords)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	// Remove duplicates
-	unique_videos := []models.Video{}
-	seen_videos := map[uint]bool{}
-	for _, val := range all_videos {
-		if _, ok := seen_videos[val.ID]; !ok {
-			unique_videos = append(unique_videos, val)
-			seen_videos[val.ID] = true
-		}
+	// unique_videos := []models.Video{}
+	// seen_videos := map[uint]bool{}
+	// for _, val := range all_videos {
+	// 	if _, ok := seen_videos[val.ID]; !ok {
+	// 		unique_videos = append(unique_videos, val)
+	// 		seen_videos[val.ID] = true
+	// 	}
+	// }
+
+	for i := 0; i < len(videos); i++ {
+		videos[i].URL = strings.Replace(videos[i].URL, "gs://", "https://storage.googleapis.com/", 1)
 	}
 
-	for i := 0; i < len(unique_videos); i++ {
-		unique_videos[i].URL = strings.Replace(unique_videos[i].URL, "gs://", "https://storage.googleapis.com/", 1)
-	}
-
-	if err := json.NewEncoder(w).Encode(&unique_videos); err != nil {
+	if err := json.NewEncoder(w).Encode(&videos); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
