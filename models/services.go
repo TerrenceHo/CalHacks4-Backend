@@ -9,6 +9,7 @@ type Services struct {
 	db    *gorm.DB
 	User  UserService
 	Class ClassService
+	Video VideoService
 }
 
 type ServicesConfig func(*Services) error
@@ -41,6 +42,13 @@ func WithUser(pepper string) ServicesConfig {
 func WithClass() ServicesConfig {
 	return func(s *Services) error {
 		s.Class = NewClassService(s.db)
+		return nil
+	}
+}
+
+func WithVideo() ServicesConfig {
+	return func(s *Services) error {
+		s.Video = NewVideoService(s.db)
 		return nil
 	}
 }

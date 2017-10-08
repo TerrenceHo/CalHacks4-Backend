@@ -19,6 +19,7 @@ func main() {
 		models.WithLogMode(!cfg.IsProd()),
 		models.WithUser(cfg.Pepper),
 		models.WithClass(),
+		models.WithVideo(),
 	)
 	must(err)
 	defer services.Close()
@@ -26,7 +27,7 @@ func main() {
 	must(err)
 
 	usersC := controllers.NewUsers(services.User, cfg.SignKey)
-	classesC := controllers.NewClasses(services.Class)
+	classesC := controllers.NewClasses(services.Class, services.Video)
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", homePage).Methods("GET")
@@ -36,6 +37,8 @@ func main() {
 	router.HandleFunc("/api/v1/classes", classesC.GetAllClasses).Methods("GET")
 	router.HandleFunc("/api/v1/classes/{class}", classesC.GetClass).Methods("GET")
 	router.HandleFunc("/api/v1/classes/create", classesC.Create).Methods("POST")
+	router.HandleFunc("/api/v1/classes/upload", classesC.Upload).Methods("POST")
+	router.HandleFunc("/api/v1/classes/search", classesC.GetByKeyword).Methods("POST")
 
 	log.Println("Listening on Port", cfg.Port)
 	log.Fatal(http.ListenAndServe(":"+cfg.Port, router))

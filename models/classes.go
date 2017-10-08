@@ -2,7 +2,6 @@ package models
 
 import (
 	"github.com/jinzhu/gorm"
-	"github.com/lib/pq"
 )
 
 type Class struct {
@@ -10,14 +9,6 @@ type Class struct {
 	Name        string
 	Description string
 	Videos      []Video
-}
-
-type Video struct {
-	gorm.Model
-	ClassID  uint
-	URL      string
-	Summary  string
-	Keywords pq.StringArray `gorm:"type:varchar(200)[]"`
 }
 
 type ClassDB interface {
